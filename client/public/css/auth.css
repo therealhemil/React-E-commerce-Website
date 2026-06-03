@@ -1,0 +1,162 @@
+/* .body-container {
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)),
+        url("https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg") center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+
+/* container */
+.auth-container {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)),
+        url("https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg") center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* box */
+.auth-box {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 30px;
+    width: 450px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.signup_logo{
+    display: block;
+}
+.signup_logo img{
+    width: 20%;
+    mix-blend-mode: multiply;
+    filter: contrast(1.5);
+}
+
+/* headings */
+.auth-box h2 {
+    margin-bottom: 10px;
+    color: black;
+}
+
+.auth-box p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
+
+}
+
+.signup-message {
+    font-size: 17px;
+    transition: 0.3s;
+    margin-top: 3px;
+}
+
+.panel-color {
+    background: whitesmoke !important;
+}
+
+/* row inputs */
+.row {
+    display: flex;
+    gap: 10px;
+}
+
+/* inputs + select */
+.auth-box input,
+.auth-box select {
+    width: 100%;
+    height: 45px;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+.login-form input {
+    background-image: none !important;
+
+}
+
+/* focus effect */
+.auth-box input:focus,
+.auth-box select:focus {
+    border-color: #f39c12;
+    outline: none;
+}
+
+.phn-spin::-webkit-outer-spin-button,
+.phn-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+
+}
+
+/* button */
+.auth-box button {
+    width: 100%;
+    height: 45px;
+    margin-top: 10px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.auth-box button:hover {
+    background: #f39c12;
+}
+
+.otp-verify-box {
+    width: 100% !important
+}
+
+.otp-verify-box::-webkit-outer-spin-button,
+.otp-verify-box::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.otp-button button {
+    margin-top: 0px !important
+}
+
+/* link */
+.switch {
+    margin-top: 15px;
+}
+
+.switch a {
+    color: #f39c12;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 600px) {
+
+    .auth-box {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .row {
+        flex-direction: column;
+    }
+
+    .auth-box input,
+    .auth-box select {
+        height: 42px;
+    }
+
+}

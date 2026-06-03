@@ -1,0 +1,138 @@
+/* ======================================================
+   LAYOUT
+====================================================== */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ======================================================
+   SIDEBAR
+====================================================== */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: #0f172a;
+  border-right: 1px solid #1e293b;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.sidebar-expanded {
+  width: 290px;
+}
+
+.sidebar-collapsed {
+  width: 90px;
+}
+
+/* ======================================================
+   MAIN
+====================================================== */
+
+.admin-main {
+  flex: 1;
+  transition: all 0.3s ease;
+  min-height: 100vh;
+}
+
+.admin-main-expanded {
+  margin-left: 290px;
+}
+
+.admin-main-collapsed {
+  margin-left: 90px;
+}
+
+.admin-page-content {
+  padding: 24px;
+  background: #071226;
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 80px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 999;
+}
+
+.app-header-container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+/* ======================================================
+   OVERLAY
+====================================================== */
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  display: none;
+}
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 1024px) {
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px !important;
+  }
+
+  .mobile-sidebar-open {
+    transform: translateX(0);
+  }
+
+  .admin-main-expanded,
+  .admin-main-collapsed {
+    margin-left: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .admin-page-content {
+    padding: 16px;
+  }
+}
+
+/* ======================================================
+   SMALL MOBILE
+====================================================== */
+
+@media (max-width: 576px) {
+
+  .app-header-container {
+    padding: 0 14px;
+  }
+
+  .admin-page-content {
+    padding: 12px;
+  }
+
+  .sidebar {
+    width: 260px !important;
+  }
+}

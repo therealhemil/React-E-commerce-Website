@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>OTP Verification</title>
+</head>
+
+<body style="
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+">
+
+    <div style="
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+    ">
+
+        <h1 style="
+            color: #222;
+            margin-bottom: 20px;
+        ">
+            OTP Verification 🔑
+        </h1>
+
+        <p style="
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        ">
+            Hello {{first_name}},
+        </p>
+
+        <p style="
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        ">
+            Use the OTP below to verify your account.
+        </p>
+
+        <div style="
+            margin: 40px 0;
+        ">
+
+            <span style="
+                display: inline-block;
+                background: #000;
+                color: white;
+                font-size: 32px;
+                letter-spacing: 8px;
+                padding: 18px 30px;
+                border-radius: 10px;
+                font-weight: bold;
+            ">
+                {{otp_code}}
+            </span>
+
+        </div>
+
+        <p style="
+            font-size: 14px;
+            color: #777;
+            line-height: 1.6;
+        ">
+            This OTP will expire in 10 minutes.
+        </p>
+
+        <p style="
+            margin-top: 40px;
+            color: #999;
+            font-size: 13px;
+        ">
+            Photography Website Team
+        </p>
+
+    </div>
+
+</body>
+
+</html>
