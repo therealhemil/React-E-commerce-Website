@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { BrandsQuery, categoriesQuery, productQuery } from "../../models/relations_model.js";
+import { where } from "sequelize";
 
 const generateFileUrl = (files) => {
     return files.map(file => {
@@ -26,7 +27,6 @@ export const addProductDetails = async (req, res) => {
         product_name,
         category_uuid,
         brand_uuid,
-        product_color,
         product_size,
         product_weight,
         product_length,
@@ -37,6 +37,8 @@ export const addProductDetails = async (req, res) => {
         product_quantity,
         product_available_quantity
     } = req.body
+
+    let product_color = JSON.parse(req.body.product_color)
 
     if (!product_name || !category_uuid || !brand_uuid) {
         return res.status(400).json({
@@ -76,17 +78,18 @@ export const addProductDetails = async (req, res) => {
         }
 
         const existingProduct = await productQuery.findOne({
-            where : {
-                name : product_name,
-                category_uuid : category_uuid,
-                brand_uuid : brand_uuid
+            where: {
+                name: product_name,
+                category_uuid: category_uuid,
+                brand_uuid: brand_uuid
             }
         })
 
-        if(existingProduct){
+        if (existingProduct) {
             return res.status(409).json({
-                message : "Product already exists",
-                type : 'error'
+                already: true,
+                message: "Product already exists",
+                type: 'error'
             })
         }
 
@@ -103,17 +106,16 @@ export const addProductDetails = async (req, res) => {
         //upload images
         let uploadedImages = []
         console.log("Received Images", req.files);
-        
+
 
         if (req.files && req.files.length > 0) {
             uploadedImages = generateFileUrl(req.files)
-
-            // console.log("Image Url generate", uploadedImages);
-            
         }
 
-        // console.log("Images Store in variable", uploadedImages);
-        
+
+
+
+
 
         const product = await productQuery.create({
             name: product_name,
@@ -135,12 +137,11 @@ export const addProductDetails = async (req, res) => {
 
         return res.status(201).json({
             message: `${product_name}, Product Added Successfully`,
-            product,
             type: "success"
         });
 
     } catch (err) {
-        console.log("Add Product Controller Error:",err);
+        console.log("Add Product Controller Error:", err);
 
         return res.status(500).json({
             message: "Internal Server Error",
@@ -151,6 +152,146 @@ export const addProductDetails = async (req, res) => {
 
 }
 
+
+
+//get all product 
+export const getallproducts = async (req, res) => {
+    try {
+        const getallproducts = await productQuery.findAll({
+            // attributes: ['id', 'uuid', 'product_images', 'name', 'product_mrp', "product_offer_price", 'product_quantity', "product_available_quantity", 'createdAt', 'category_uuid', 'brand_uuid', 'product_specification'],
+            order: [['id', 'ASC']]
+        }, { where: { product_isDeleted: false } })
+
+        return res.status(200).json({
+            getallproducts,
+            success: true
+        })
+    } catch (err) {
+        return res.status(500).json({
+            message: 'Server Error',
+            success: false
+        });
+    }
+
+
+}
+
+
+//delete product by uuid
+export const deleteProduct = async (req, res) => {
+    const { uuid } = req.params
+
+    try {
+        await productQuery.update(
+            { product_isDeleted: true },
+            {
+                where: { uuid }
+            })
+
+        return res.status(200).json({
+            message: 'Product Deleted Successfully',
+            type: 'success'
+        })
+
+    } catch (err) {
+        console.log("Delete Product Error:", err);
+        return res.status(500).json({
+            messge: "Server Error",
+            type: 'error'
+        })
+
+    }
+}
+
+
+
+//Update Product by uuid
+export const UpdateProduct = async (req, res) => {
+    console.log('Body', req.body);
+    console.log('Files', req.files);
+
+
+    try {
+        const {
+            product_uuid,
+            product_name,
+            product_color,
+            product_size,
+            product_weight,
+            product_length,
+            product_width,
+            product_specification,
+            product_mrp,
+            product_offer_price,
+            product_quantity,
+            product_available_quantity,
+            existing_images
+        } = req.body
+
+
+        if (!product_uuid) {
+            return res.status(500).json({
+                message: 'Product UUID Required',
+                type: 'error'
+            })
+        }
+
+        const product = await productQuery.findOne({
+            where: { uuid: product_uuid }
+        })
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not Found",
+                type: 'error'
+            })
+        }
+
+
+        let productImages = []
+
+        if (existing_images) {
+            productImages = JSON.parse(existing_images)
+        }
+
+        if (req.files.length > 0) {
+            const uploadingImages = generateFileUrl(req.files)
+            productImages = [...productImages, ...uploadingImages]
+        }
+
+
+        const updatedProduct = await product.update({
+            name : product_name,
+            product_color: JSON.parse(product_color),
+            product_size : product_size,
+            product_weight : product_weight,
+            product_length : product_length,
+            product_width : product_width,
+            product_specification: JSON.parse(product_specification),
+            product_mrp : product_mrp,
+            product_offer_price : product_offer_price,
+            product_quantity : product_quantity,
+            product_available_quantity : product_available_quantity,
+            product_images: productImages,
+        });
+
+        return res.status(200).json({
+            message : 'Product Update Successfully',
+            updatedProduct,
+            type : 'success'
+        })
+
+    } catch (err) {
+        console.log('Update Product Error:', err);
+        return res.status(500).josn({
+            message : 'Server Error',
+            type : 'error'
+        })
+        
+    }
+
+}
 
 
 

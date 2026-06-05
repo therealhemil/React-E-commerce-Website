@@ -50,8 +50,7 @@ export const productQuery = db.define("products", {
         defaultValue: []
     },
     product_size: {
-        type: DataTypes.JSON,
-        defaultValue: []
+        type: DataTypes.STRING,
     },
     product_weight : {
         type : DataTypes.STRING
@@ -63,7 +62,6 @@ export const productQuery = db.define("products", {
         type : DataTypes.STRING
     },
     sub_product_id: {
-        type: DataTypes.JSON,
-        defaultValue: []
+        type: DataTypes.INTEGER,
     }
 })

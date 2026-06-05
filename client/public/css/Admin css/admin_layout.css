@@ -25,7 +25,7 @@
 }
 
 .sidebar-expanded {
-  width: 290px;
+  width: 250px;
 }
 
 .sidebar-collapsed {
@@ -43,7 +43,7 @@
 }
 
 .admin-main-expanded {
-  margin-left: 290px;
+  margin-left: 250px;
 }
 
 .admin-main-collapsed {

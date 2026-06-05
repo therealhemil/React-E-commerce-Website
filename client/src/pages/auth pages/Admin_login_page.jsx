@@ -8,6 +8,7 @@ function Admin_login_page() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
+
     const handleAdminLogin = async (e) => {
         e.preventDefault()
 
@@ -27,16 +28,25 @@ function Admin_login_page() {
                 id: toastloading
             })
 
-            setTimeout(() => {
-                navigate('/admin/dashboard')
-            }, 1500);
+            if (res.data.success) {
+                setTimeout(() => {
+                    navigate('/admin/dashboard')
+                }, 1500);
+            }else{
+                if(!res.data.error){
+                    e.target.password.value = ''
+                } else{
+                    e.target.reset() // form reset form
+                }
+
+            }
+            // e.target.reset() // form reset form
+            setLoading(false)
+
 
         } catch (err) {
             console.log("Admin login Frontend Error:", err);
             toast.error("Server Error")
-        } finally {
-            e.target.reset() // form reset form
-            setLoading(false)
         }
     }
 
@@ -55,7 +65,7 @@ function Admin_login_page() {
                         <input type="email" name="email" placeholder="Email Address" required />
                         <input type="password" name="password" placeholder="Password" required />
 
-                        <button disabled={loading} style={{cursor : loading ? 'not-allowed' : 'pointer'}} className={loading ? 'opacity-50 cursor-not-allowed' : ''} type="submit">{loading ? "Please Wait..." : "Admin Login"}</button>
+                        <button disabled={loading} style={{ cursor: loading ? 'not-allowed' : 'pointer' }} className={loading ? 'opacity-50 cursor-not-allowed' : ''} type="submit">{loading ? "Please Wait..." : "Admin Login"}</button>
                     </form>
                 </div>
 

@@ -67,7 +67,7 @@ function User_login_page() {
                     <p className="switch">
                         Don't have an account? <Link to="/signup">Sign Up</Link>
                     </p>
-                    <p className='forgot-button' style={{ color: "#f39c12", fontWeight: "bold", cursor: "pointer" }}>Forgot Password?</p>
+                    {/* <p className='forgot-button' style={{ color: "#f39c12", fontWeight: "bold", cursor: "pointer" }}>Forgot Password?</p> */}
                 </div>
 
                 {/* User login Data */}

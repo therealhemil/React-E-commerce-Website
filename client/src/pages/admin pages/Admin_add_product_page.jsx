@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../../public/css/Admin css/admin_addProduct.css";
 import PageBreadCrumb from "../../components/common/PageBreadCrumb";
 import axios from "axios";
 import { Details_components } from "./reuse components/Details_key_value_pair";
 import toast from "react-hot-toast";
+import { ProductColors } from "./reuse components/Product_color";
 
 
 export const Admin_AddProduct = () => {
-  const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  //set color
+  const [color, setColor] = useState([]);
 
   //select category
   const [selectCategory, setSelectCategory] = useState('')
@@ -23,12 +27,12 @@ export const Admin_AddProduct = () => {
   //set category name
   const [brand, setBrand] = useState([]);
 
-  const [details, setDetails] = useState([
-    { key: "", value: "" }
-  ]);
+  const [details, setDetails] = useState([]);
 
   const [images, setImages] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
+
+  const fileInputRef = useRef(null)
 
 
 
@@ -55,7 +59,7 @@ export const Admin_AddProduct = () => {
 
 
   //filter brand
-  const filteredBrand = brand.filter((item)=> item.category_uuid === selectCategory)
+  const filteredBrand = brand.filter((item) => item.category_uuid === selectCategory)
 
 
   const handleAddProduct = async (e) => {
@@ -68,7 +72,7 @@ export const Admin_AddProduct = () => {
     formData.append('product_name', e.target.product_name.value)
     formData.append('category_uuid', selectCategory)
     formData.append('brand_uuid', selectbrand)
-    formData.append('product_color', e.target.product_color.value)
+    formData.append('product_color', JSON.stringify(color))
     formData.append('product_size', e.target.product_size.value)
     formData.append('product_weight', e.target.product_weight.value)
     formData.append('product_length', e.target.product_length.value)
@@ -78,14 +82,14 @@ export const Admin_AddProduct = () => {
     formData.append('product_quantity', e.target.product_quantity.value)
     formData.append('product_available_quantity', e.target.product_available_quantity.value)
 
-    const detailsObject = {}
-    details.forEach((item) => {
-      if (item.key.trim() && item.value.trim()) {
-        detailsObject[item.key] = item.value
-      }
-    })
+    const detailsObject = details.filter(item=> item.key.trim() && item.value.trim()).map(item => ({   
+        [item.key]: item.value
+    }))
 
     formData.append('details', JSON.stringify(detailsObject))
+
+    console.log("specifiaction add", JSON.stringify.apply(detailsObject));
+    
 
     //images
     images.forEach((img) => {
@@ -97,14 +101,38 @@ export const Admin_AddProduct = () => {
       const res = await axios.post("http://localhost:3000/admin/api/add/product", formData)
 
       const { message, type } = res.data
-      toast[type](message, {
-        id: toastloading
-      })
+
+      if(res.data.already){
+        toast[type](message, {
+          id: toastloading
+        })
+      } else{
+        toast[type](message, {
+          id: toastloading
+        })
+        
+      }
+
 
       console.log("Add Product Response", res.data);
 
-      
       e.target.reset()
+      setColor([])
+      setQuantity('')
+      setSelectCategory('')
+      setSelectbrand('')
+      setImages([])
+      setPreviewImages([])
+      setDetails([{ key: '', value: '' }])
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
+
       setLoading(false)
 
     } catch (err) {
@@ -118,15 +146,25 @@ export const Admin_AddProduct = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImages(files);
+    setImages((prev) => [...prev, ...files]);
+
 
     const previews = files.map(file =>
       URL.createObjectURL(file)
     );
 
-    setPreviewImages(previews);
+    setPreviewImages((prev) => [...prev, ...previews]);
+
+    e.target.value = ''
   };
 
+  const removeImage = (index) => {
+    URL.revokeObjectURL(previewImages[index])
+
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index))
+
+    setImages((prev) => prev.filter((_, i) => i !== index))
+  }
 
 
 
@@ -173,13 +211,13 @@ export const Admin_AddProduct = () => {
               </div>
             </div>
 
-            <div className="form-grid three-column">
+            <div className="form-grid two-column">
 
               <div className="form-group">
                 <label>Brand</label>
                 <select name="brand_uuid" value={selectbrand} onChange={(e) => setSelectbrand(e.target.value)} required disabled={!selectCategory}>
                   <option value="">Select Brand</option>
-                  {filteredBrand.map((brand, index)=> (
+                  {filteredBrand.map((brand, index) => (
                     <option key={index} value={brand.uuid}>{brand.name}</option>
                   ))}
                   {/* {brand.map((brand, index) => (
@@ -188,33 +226,30 @@ export const Admin_AddProduct = () => {
                 </select>
               </div>
 
-              <div className="form-group">
-                <label>Color</label>
-                <input type="text" name="product_color" placeholder="Enter Product Color" />
-              </div>
-
-              <div className="form-group">
-                <label>Size</label>
-                <input type="text" name="product_size" placeholder="Enter Product Size" />
-              </div>
+              {/* color Picker */}
+              <ProductColors color={color} setColor={setColor} labelName={'Product Colors'} />
 
             </div>
 
 
-            <div className="form-grid three-column">
+            <div className="form-grid two-column">
+              <div className="form-group">
+                <label>Size</label>
+                <input type="text" name="product_size" placeholder="Enter Product Size" />
+              </div>
               <div className="form-group">
                 <label>Weight (kg)</label>
-                <input type="number" name="product_weight" defaultValue="15" />
+                <input type="number" onWheel={(e)=> e.target.blur()} name="product_weight" defaultValue="15" />
               </div>
 
               <div className="form-group">
                 <label>Length (cm)</label>
-                <input type="number" name="product_length" defaultValue="120" />
+                <input type="number" onWheel={(e)=> e.target.blur()} name="product_length" defaultValue="120" />
               </div>
 
               <div className="form-group">
                 <label>Width (cm)</label>
-                <input type="number" name="product_width" defaultValue="23" />
+                <input type="number" onWheel={(e)=> e.target.blur()} name="product_width" defaultValue="23" />
               </div>
             </div>
           </div>
@@ -223,7 +258,7 @@ export const Admin_AddProduct = () => {
         <div className="product-card">
           <div className="card-header">
 
-            <Details_components details={details} setDetails={setDetails} />
+            <Details_components details={details} setDetails={setDetails} labelName={'Product Specification'} />
 
             {/* <div className="form-group">
             <label>Description</label>
@@ -246,18 +281,13 @@ export const Admin_AddProduct = () => {
             <div className="form-grid two-column">
               <div className="form-group">
                 <label>Product MRP (Rs.)</label>
-                <input type="number" name="product_mrp" defaultValue="15" />
+                <input type="number" onWheel={(e)=> e.target.blur()} name="product_mrp" defaultValue="15" />
               </div>
 
               <div className="form-group">
                 <label>Product Offer Price (Rs.)</label>
-                <input type="number" name="product_offer_price" defaultValue="10" />
+                <input type="number" onWheel={(e)=> e.target.blur()} name="product_offer_price" defaultValue="10" />
               </div>
-
-              {/* <div className="form-group">
-              <label>Tax (%)</label>
-              <input type="number" defaultValue="23" />
-              </div> */}
             </div>
 
             <div className="form-grid two-column">
@@ -265,14 +295,14 @@ export const Admin_AddProduct = () => {
                 <label>Stock Quantity</label>
 
                 <div className="quantity-box">
-                  <input type="number" name="product_quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} defaultValue="10" />
+                  <input type="number" onWheel={(e)=> e.target.blur()} name="product_quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                 </div>
               </div>
 
               <div className="form-group">
                 <label>Available Stock Quantity</label>
                 <div className="quantity-box">
-                  <input type="number" name="product_available_quantity" value={quantity} />
+                  <input type="number" onWheel={(e)=> e.target.blur()} name="product_available_quantity" value={quantity} readOnly />
                 </div>
               </div>
             </div>
@@ -288,44 +318,55 @@ export const Admin_AddProduct = () => {
           <div className="card-body">
 
             <div className="upload-box">
-              <div className="upload-icon">⬆</div>
+              {images && images.length >= 5 ? (
+                <p>Max 5 Image Upload </p>
+              ) : (
+                <>
+                  <div className="upload-icon">⬆</div>
+                  <p>
+                    <strong>Click to upload</strong> or drag and
+                    drop SVG, PNG, JPG or GIF
+                  </p>
+                  <span>(MAX. 800x400px)</span><br />
+                  <span>(Maximum 5 Images)</span>
+                </>
+              )}
 
-              <p>
-                <strong>Click to upload</strong> or drag and
-                drop SVG, PNG, JPG or GIF
-              </p>
-
-              <span>(MAX. 800x400px)</span>
-
-              <input type="file"
+              <input
+                ref={fileInputRef}
+                type="file"
                 multiple
                 name="images"
-                onChange={handleImageChange} />
+                onChange={handleImageChange}
+                disabled={images.length >= 5}
+              />
             </div>
 
             <div
               style={{
                 display: "flex",
-                gap: "10px",
+                gap: "20px",
                 flexWrap: "wrap",
                 marginTop: "15px"
               }}
             >
-              hello
-              {previewImages.map((img, index) => {
+              {previewImages.map((img, index) => (
                 <>
-                  <span>{index + 1}</span>
-                  <img src={img} alt={`preview-${img.name}`}
-                    style={{
-                      width: "120px",
-                    height: "120px",
-                      objectFit: "cover",
-                      borderRadius: "10px",
-                      border: "1px solid #ddd"
-                    }} />
+                  <div key={index} className="preview-box" style={{ position: 'relative' }}>
+                    <button type="button" className="remove-image-button" onClick={() => removeImage(index)}>X</button>
+                    <img src={img} alt={`preview-${index}`}
+                      style={{
+                        width: "120px",
+                        height: "120px",
+                        objectFit: "cover",
+                        borderRadius: "10px",
+                        border: "1px solid #ddd",
+                      }} />
+                    <p>{index + 1}. {images[index].name}</p>
+                  </div>
 
                 </>
-              })}
+              ))}
             </div>
           </div>
         </div>
@@ -341,7 +382,7 @@ export const Admin_AddProduct = () => {
           </button>
         </div>
 
-      </form>
+      </form >
     </div >
   );
 };

@@ -56,7 +56,36 @@ export const getbrandDetail = async (req, res) => {
             order: [['id', 'ASC']]
         })
 
+        const getcategoryNameOnly = await categoriesQuery.findAll({
+            attributes: ['uuid', 'name'],
+            order: [['id', 'ASC']]
+        })
+    
+
+        const category_hash = {}
+        getcategoryNameOnly.forEach((category) => {
+            category_hash[category.uuid] = {
+                category_uuid : category.uuid,
+                category_name : category.name
+            }
+        })
+
+
+        const brand_hash = {}
+        getbrandDetail.forEach((brand) => {
+            
+            brand_hash[brand.uuid] = {
+                brand_id: brand.id,
+                brand_name: brand.name,
+                brand_uuid: brand.uuid,
+                brand_image: brand.brand_image,
+                category_uuid: brand.category_uuid,
+                category: category_hash[brand.category_uuid] || null
+            }
+        })
+
         return res.status(200).json({
+            brand_hash,
             getbrandDetail,
             success: true
         })

@@ -1,26 +1,17 @@
 import { UserQuery } from "../../models/user_model.js"
 import bcrypt from 'bcrypt'
 import { createAuthToken, setAuthCookie } from "../../utils/jwt.js"
-import { logging } from "@getbrevo/brevo"
-import { BrandsQuery } from "../../models/brands_model.js"
-import { categoriesQuery } from "../../models/categories_model.js"
-import { productQuery } from "../../models/product_model.js"
 
 
 export const Admin_login_controller = async (req, res) => {
     const { email, password } = req.body
 
     try {
-        const isAdmin = await UserQuery.findOne({ where: { email } })
-        
-        // trial
-        const query1 = await BrandsQuery
-        const query2 = await categoriesQuery
-        const query3 = await productQuery
-
+        const isAdmin = await UserQuery.findOne({ where: { email } })    
         
         if (!isAdmin) {
             return res.json({
+                error : true,
                 message: "Access Denied!",
                 type: 'error'
             })
@@ -29,6 +20,7 @@ export const Admin_login_controller = async (req, res) => {
         const role = isAdmin.role
         if (role !== 'admin') {
             return res.json({
+                error : true,
                 message: "Access Denied!",
                 type: 'error'
             })
@@ -39,6 +31,7 @@ export const Admin_login_controller = async (req, res) => {
 
         if (!isPassMatch) {
             return res.json({
+                error : false,
                 message: "Wrong Password",
                 type: 'error'
             })
@@ -51,6 +44,7 @@ export const Admin_login_controller = async (req, res) => {
             // set token in cookie
             setAuthCookie(res, token)
             return res.json({
+                success : true,
                 message: "Welcome Admin Dashboard",
                 type: 'success'
             })

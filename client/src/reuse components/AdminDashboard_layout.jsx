@@ -53,7 +53,7 @@ export const Admin_layout = () => {
           }
         />
 
-        <div className="admin-page-content">
+        <div className="admin-page-content" style={{height : '100%'}}>
           <Outlet />
         </div>
       </div>
