@@ -104,6 +104,7 @@ export const User_login_controller = async (req, res) => {
         //enter password wrong
         if (!userPassword) {
             return res.json({
+                pass : false,
                 message: "Enter Wrong Password",
                 type: "error"
             })

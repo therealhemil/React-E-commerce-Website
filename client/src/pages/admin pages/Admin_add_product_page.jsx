@@ -82,14 +82,14 @@ export const Admin_AddProduct = () => {
     formData.append('product_quantity', e.target.product_quantity.value)
     formData.append('product_available_quantity', e.target.product_available_quantity.value)
 
-    const detailsObject = details.filter(item=> item.key.trim() && item.value.trim()).map(item => ({   
-        [item.key]: item.value
+    const detailsObject = details.filter(item => item.key.trim() && item.value.trim()).map(item => ({
+      [item.key]: item.value
     }))
 
     formData.append('details', JSON.stringify(detailsObject))
 
     console.log("specifiaction add", JSON.stringify.apply(detailsObject));
-    
+
 
     //images
     images.forEach((img) => {
@@ -102,38 +102,45 @@ export const Admin_AddProduct = () => {
 
       const { message, type } = res.data
 
-      if(res.data.already){
+      console.log('Add product Response: ', res.data);
+      
+
+      if (res.data.already) {
         toast[type](message, {
           id: toastloading
         })
-      } else{
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        })
+        setLoading(false)
+
+      } else {
         toast[type](message, {
           id: toastloading
         })
-        
+
+        console.log("Add Product Response", res.data);
+
+        e.target.reset()
+        setColor([])
+        setQuantity('')
+        setSelectCategory('')
+        setSelectbrand('')
+        setImages([])
+        setPreviewImages([])
+        setDetails([{ key: '', value: '' }])
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        })
+
+        setLoading(false)
       }
-
-
-      console.log("Add Product Response", res.data);
-
-      e.target.reset()
-      setColor([])
-      setQuantity('')
-      setSelectCategory('')
-      setSelectbrand('')
-      setImages([])
-      setPreviewImages([])
-      setDetails([{ key: '', value: '' }])
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
-
-      setLoading(false)
 
     } catch (err) {
 
@@ -239,17 +246,17 @@ export const Admin_AddProduct = () => {
               </div>
               <div className="form-group">
                 <label>Weight (kg)</label>
-                <input type="number" onWheel={(e)=> e.target.blur()} name="product_weight" defaultValue="15" />
+                <input type="number" onWheel={(e) => e.target.blur()} name="product_weight" defaultValue="15" />
               </div>
 
               <div className="form-group">
                 <label>Length (cm)</label>
-                <input type="number" onWheel={(e)=> e.target.blur()} name="product_length" defaultValue="120" />
+                <input type="number" onWheel={(e) => e.target.blur()} name="product_length" defaultValue="120" />
               </div>
 
               <div className="form-group">
                 <label>Width (cm)</label>
-                <input type="number" onWheel={(e)=> e.target.blur()} name="product_width" defaultValue="23" />
+                <input type="number" onWheel={(e) => e.target.blur()} name="product_width" defaultValue="23" />
               </div>
             </div>
           </div>
@@ -281,12 +288,12 @@ export const Admin_AddProduct = () => {
             <div className="form-grid two-column">
               <div className="form-group">
                 <label>Product MRP (Rs.)</label>
-                <input type="number" onWheel={(e)=> e.target.blur()} name="product_mrp" defaultValue="15" />
+                <input type="number" onWheel={(e) => e.target.blur()} name="product_mrp" defaultValue="15" />
               </div>
 
               <div className="form-group">
                 <label>Product Offer Price (Rs.)</label>
-                <input type="number" onWheel={(e)=> e.target.blur()} name="product_offer_price" defaultValue="10" />
+                <input type="number" onWheel={(e) => e.target.blur()} name="product_offer_price" defaultValue="10" />
               </div>
             </div>
 
@@ -295,14 +302,14 @@ export const Admin_AddProduct = () => {
                 <label>Stock Quantity</label>
 
                 <div className="quantity-box">
-                  <input type="number" onWheel={(e)=> e.target.blur()} name="product_quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                  <input type="number" onWheel={(e) => e.target.blur()} name="product_quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                 </div>
               </div>
 
               <div className="form-group">
                 <label>Available Stock Quantity</label>
                 <div className="quantity-box">
-                  <input type="number" onWheel={(e)=> e.target.blur()} name="product_available_quantity" value={quantity} readOnly />
+                  <input type="number" onWheel={(e) => e.target.blur()} name="product_available_quantity" value={quantity} readOnly />
                 </div>
               </div>
             </div>

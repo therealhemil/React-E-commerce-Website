@@ -29,9 +29,7 @@ export const categories_by_brands = [
 
 
 
-function Header() {
-
-
+function Header({categoryList, brandList}) {
 
     return (
         <>
@@ -50,7 +48,7 @@ function Header() {
                     <div className="navbar-links-box" style={{ width: '70%', textAlign: 'center' }}>
                         <div className="catogories-box" style={{ border: '1.5px solid black' }}>
                             <select name="select_category" className="select-category">
-                                {categories_List.map((item, index) => (
+                                {categoryList.map((item, index) => (
                                     <option key={index} value={item.name}>{item.name}</option>
 
                                 ))}
@@ -86,7 +84,7 @@ function Header() {
 
                 <nav className="navbar" style={{boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)'}}>
                     <div className="categories_list">
-                        {categories_List.map((item, index) => (
+                        {categoryList.map((item, index) => (
                             <Link key={index} to={item.Link}>{item.name}</Link>
                         ))}
 

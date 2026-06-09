@@ -1,5 +1,5 @@
 import express from 'express'
-import { addBrandsInCategory, brandImageandMoreDetails, getbrandDetail } from '../controller/brand_controller.js'
+import { addBrandsInCategory, brandImageandMoreDetails, getbrand_categoryDetails, getbrandDetail } from '../controller/brand_controller.js'
 import { upload } from '../../config/multerS3Config.js'
 
 const router = express.Router()
@@ -9,6 +9,9 @@ router.post("/admin/api/add/brand", addBrandsInCategory)
 
 //get brand detail
 router.get("/admin/api/get/brandDetail", getbrandDetail)
+
+//get brand and category details
+router.get("/admin/api/get/brand_and_catgeory", getbrand_categoryDetails)
 
 
 // update brand more details

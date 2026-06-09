@@ -455,3 +455,10 @@
   transform: scale(1.05);
   transition: 0.2s ease;
 }
+
+.category_remove{
+  color: white;
+}
+.category_remove:hover{
+  color: red;
+}

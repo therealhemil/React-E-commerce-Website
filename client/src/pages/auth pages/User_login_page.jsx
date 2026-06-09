@@ -24,12 +24,21 @@ function User_login_page() {
 
             const { message, message2, type } = res.data
 
+            if (!res.data.pass) {
+                toast[type](message, {
+                    id: toastloading
+                })
+                e.target.password.value = ''
+            }
+            
             if (res.data.success) {
                 toast[type](message, {
                     id: toastloading
                 })
                 toast.success(message2)
             }
+
+
             toast[type](message, {
                 id: toastloading
             })
@@ -37,7 +46,7 @@ function User_login_page() {
         } catch (err) {
             console.log("User login Frontend Error:", err);
             toast.error("Server Error")
-        } finally{
+        } finally {
             e.target.reset() // form reset
             setLoading(false)
         }
@@ -60,7 +69,7 @@ function User_login_page() {
                         <input type="email" name="email" placeholder="Email Address" style={{ backgroundImage: 'none' }} required />
                         <input type="password" name="password" placeholder="Password" required />
 
-                        <button disabled={loading} style={{cursor : loading ? 'not-allowed' : 'pointer'}} className={loading ? 'opacity-50 cursor-not-allowed' : ''} type="submit">{loading ? "Please Wait...": "Login"}</button>
+                        <button disabled={loading} style={{ cursor: loading ? 'not-allowed' : 'pointer' }} className={loading ? 'opacity-50 cursor-not-allowed' : ''} type="submit">{loading ? "Please Wait..." : "Login"}</button>
                     </form>
                     {/* <button onClick={() => loginWithGoogle()}>Continue with Google</button> */}
 

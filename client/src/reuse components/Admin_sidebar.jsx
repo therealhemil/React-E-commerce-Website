@@ -15,6 +15,7 @@ import {
   ChevronDown,
   MoreHorizontal,
   ShoppingCart,
+  LogOutIcon,
 } from "lucide-react";
 
 const navItems = [
@@ -36,6 +37,11 @@ const navItems = [
     icon: <UserCircle size={20} />,
     name: "User Profile",
     path: "/profile",
+  },
+  {
+    icon: <LogOutIcon size={20} />,
+    name: "Logout",
+    path: "/admin",
   },
   {
     // icon: <Calendar size={20} />,

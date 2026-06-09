@@ -30,6 +30,7 @@ function App() {
           <Route path="/login" element={<User_login_page />} />
           <Route path="/signup" element={<User_signup_page />} />
 
+
           {/* Admin Auth Route Page */}
           <Route path="/admin" element={<Admin_login_page />} />
 

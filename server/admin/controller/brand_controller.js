@@ -1,3 +1,4 @@
+import { brand_category } from "../../models/brand_catgeory_model.js";
 import { BrandsQuery, categoriesQuery } from "../../models/relations_model.js"
 
 
@@ -18,6 +19,7 @@ export const addBrandsInCategory = async (req, res) => {
             }
         })
 
+        brand_category
         if (!category) {
             return res.status(404).json({
                 message: "Category Not Found",
@@ -27,7 +29,7 @@ export const addBrandsInCategory = async (req, res) => {
 
         const brand = await BrandsQuery.create({
             name: brand_name,
-            category_uuid: category.uuid
+            category_uuid
         })
 
         return res.status(201).json({
@@ -60,20 +62,20 @@ export const getbrandDetail = async (req, res) => {
             attributes: ['uuid', 'name'],
             order: [['id', 'ASC']]
         })
-    
+
 
         const category_hash = {}
         getcategoryNameOnly.forEach((category) => {
             category_hash[category.uuid] = {
-                category_uuid : category.uuid,
-                category_name : category.name
+                category_uuid: category.uuid,
+                category_name: category.name
             }
         })
 
 
         const brand_hash = {}
         getbrandDetail.forEach((brand) => {
-            
+
             brand_hash[brand.uuid] = {
                 brand_id: brand.id,
                 brand_name: brand.name,
@@ -165,5 +167,47 @@ export const brandImageandMoreDetails = async (req, res) => {
     }
 };
 
+
+
+export const getbrand_categoryDetails = async (req, res) => {
+    try {
+        const getbrandDetail = await BrandsQuery.findAll({
+            attributes: ['id', 'uuid', 'name', 'brand_image'],
+            order: [['id', 'ASC']]
+        })
+
+        const getcategoryNameOnly = await categoriesQuery.findAll({
+            attributes: ['uuid', 'name'],
+            order: [['id', 'ASC']]
+        })
+
+
+        const unique_brand = {}
+        getbrandDetail.forEach((brand) => {
+            if (!unique_brand[brand.name]) {
+                unique_brand[brand.name] = {
+                    uuid: brand.uuid,
+                    name: brand.name,
+                    brand_image: brand.brand_image
+                }
+            }
+        })
+
+
+        return res.status(200).json({
+            unique_brand: Object.values(unique_brand),
+            getcategoryNameOnly,
+            success: true
+        })
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            message: 'Server Error',
+            success: false
+        });
+    }
+
+}
 
 

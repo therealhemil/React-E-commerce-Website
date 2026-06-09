@@ -86,7 +86,7 @@ export const addProductDetails = async (req, res) => {
         })
 
         if (existingProduct) {
-            return res.status(409).json({
+            return res.status(200).json({
                 already: true,
                 message: "Product already exists",
                 type: 'error'
@@ -136,6 +136,7 @@ export const addProductDetails = async (req, res) => {
         })
 
         return res.status(201).json({
+            already : false,
             message: `${product_name}, Product Added Successfully`,
             type: "success"
         });

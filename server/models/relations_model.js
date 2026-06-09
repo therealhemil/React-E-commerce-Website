@@ -1,17 +1,28 @@
+import { brand_category } from "./brand_catgeory_model.js";
 import { BrandsQuery } from "./brands_model.js";
 import { categoriesQuery } from "./categories_model.js";
 import { productQuery } from "./product_model.js";
 
 
-// Category -> Brand
-categoriesQuery.hasMany(BrandsQuery, {
-    foreignKey: 'category_uuid',
+// // Category -> Brand
+// categoriesQuery.hasMany(BrandsQuery, {
+//     foreignKey: 'category_uuid',
+//     sourceKey: 'uuid'
+// })
+
+BrandsQuery.belongsToMany(categoriesQuery, {
+    through : brand_category,
+    foreignKey: "category_uuid",
+    otherKey : 'brand_uuid',
     sourceKey: 'uuid'
 })
 
-BrandsQuery.belongsTo(categoriesQuery, {
-    foreignKey: "category_uuid",
-    targetKey: "uuid"
+
+categoriesQuery.belongsToMany(brand_category,{
+    through : brand_category,
+    foreignKey: 'brand_uuid',
+    otherKey : 'category_uuid',
+    sourceKey: 'uuid'
 })
 
 

@@ -6,10 +6,12 @@ import axios from "axios";
 import { Details_components } from "./reuse components/Details_key_value_pair";
 import { BasicTableOne } from "./reuse components/Add-category";
 import { categories_by_brands } from "../../components/Header";
+import Select from 'react-select'
+
 
 
 export const Admin_addBrands = () => {
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState([]);
   const [brand, setBrand] = useState([]);
@@ -134,6 +136,28 @@ export const Admin_addBrands = () => {
     }
   }
 
+  const handleCategorySelect = (e) => {
+    const value = e.target.value
+
+    if (!value) return
+
+    const alreadySelected = selected.includes(value)
+
+    if (!alreadySelected) {
+      setSelected([...selected, value])
+    }
+
+    e.target.value = ''
+  }
+
+
+  const removeCategory = (id) => {
+    setSelected(selected.filter((item) => item !== id))
+  }
+
+
+
+
 
   return (
     <>
@@ -168,16 +192,33 @@ export const Admin_addBrands = () => {
                     <input type="text" placeholder="Enter Brands Name" name="brand_name" style={{ width: '350px', letterSpacing: '1.1px' }} />
 
                     {/* SELECT */}
-                    <select name="category_name" value={selected} onChange={(e) => setSelected(e.target.value)} style={{ width: '20%' }}>
+                    <select name="category_name" onChange={handleCategorySelect} style={{ width: '20%' }}>
                       <option value="">Select Category</option>
-                      {category.map((category, index) => (
+                      {category.filter((item) => !selected.includes(item.uuid)).map((category, index) => (
+
+                        // ))}
+                        // {category.map((category, index) => (
                         <option key={index} name="category_id" value={category.uuid}>{category.name}</option>
                       ))}
                     </select>
 
+
                     {/* <p> Selected Value: <strong> {selected}</strong></p> */}
 
                     <button type="submit" disabled={!selected} style={{ marginTop: '4px', width: '60px', height: '40px', borderRadius: '20px', cursor: loading ? 'not-allowed' : 'pointer' }}>{loading ? 'Adding..' : 'Add'}</button>
+                  </div>
+                  {/* Selected Categories */}
+                  <div style={{display: 'flex', flexWrap : 'wrap', gap : '1px', marginTop : '10px', marginLeft: '36%'}}>
+                    {selected.map((id) => {
+                      const cat = category.find((c) => c.uuid === id)
+
+                      return (
+                        <div key={id} style={{padding : '5px 10px', display : 'flex', alignItems: 'center', gap: '5px' }}>
+                          <span>{cat?.name}</span>
+                          <button className="category_remove" type="button" onClick={()=> removeCategory(id)} style={{border : 'none', background: 'transparent', cursor: 'pointer', fontWeight: 'bold'}}>x</button>
+                        </div>
+                      )
+                    })}
                   </div>
                 </form>
               </div>

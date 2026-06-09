@@ -1,26 +1,53 @@
 import { UserQuery } from "../../models/user_model.js"
 import bcrypt from 'bcrypt'
 import { createAuthToken, setAuthCookie } from "../../utils/jwt.js"
+import jwt from 'jsonwebtoken'
+
+
+export const AdminCheckAuth = (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1]
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized Access'
+            })
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
+
+        return res.status(200).json({
+            suceess: true,
+            adminToken: decoded
+        })
+    } catch (err) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid Token"
+        });
+    }
+}
+
 
 
 export const Admin_login_controller = async (req, res) => {
     const { email, password } = req.body
 
     try {
-        const isAdmin = await UserQuery.findOne({ where: { email } })    
-        
+        const isAdmin = await UserQuery.findOne({ where: { email } })
+
         if (!isAdmin) {
             return res.json({
-                error : true,
+                error: true,
                 message: "Access Denied!",
                 type: 'error'
             })
         }
-        
+
         const role = isAdmin.role
         if (role !== 'admin') {
             return res.json({
-                error : true,
+                error: true,
                 message: "Access Denied!",
                 type: 'error'
             })
@@ -31,7 +58,7 @@ export const Admin_login_controller = async (req, res) => {
 
         if (!isPassMatch) {
             return res.json({
-                error : false,
+                error: false,
                 message: "Wrong Password",
                 type: 'error'
             })
@@ -44,7 +71,7 @@ export const Admin_login_controller = async (req, res) => {
             // set token in cookie
             setAuthCookie(res, token)
             return res.json({
-                success : true,
+                success: true,
                 message: "Welcome Admin Dashboard",
                 type: 'success'
             })

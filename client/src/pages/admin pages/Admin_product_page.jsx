@@ -43,9 +43,8 @@ function Admin_product_page() {
 
     const PreviewProductImages = [...(selectproduct?.product_images || []), ...images]
 
-console.log("Details:", details);
-console.log('Product Specification:', productSpecification);
-
+    console.log("Details:", details);
+    console.log('Product Specification:', productSpecification);
 
 
     useEffect(() => {
@@ -55,7 +54,6 @@ console.log('Product Specification:', productSpecification);
     }, []);
 
     const getproducts = async () => {
-
         const res = await axios.get('http://localhost:3000/admin/api/get/productDetail')
         setAllproducts(res.data.getallproducts)
         console.log("Get All Products:", res.data.getallproducts);
@@ -75,6 +73,9 @@ console.log('Product Specification:', productSpecification);
         // setOptions(res.data.categories);
         console.log(res.data);
         setBrand(res.data.getbrandDetail)
+        // setBrand(Object.values(res.data.brand_hash))
+        console.log('Brand data', brand);
+
     };
 
 
@@ -120,26 +121,43 @@ console.log('Product Specification:', productSpecification);
     };
 
     const handleSpecificationChange = (index, oldKey, type, newValue) => {
-        setSelectproduct(prev => {
-            const updated = [...prev.product_specification]
+        const productSpecLength = selectproduct.product_specification?.length || 0;
 
-            const oldValue = updated[index][oldKey]
+        if (index < productSpecLength) {
+            // Existing specification
+            setSelectproduct(prev => {
+                const updated = [...prev.product_specification];
 
-            if (type === 'key') {
-                updated[index] = {
-                    [newValue]: oldValue
-                }
-            } else {
-                updated[index] = {
-                    [oldKey]: newValue
-                }
-            }
+                const oldValue = updated[index][oldKey];
 
-            // setDetails= {...prev, productSpecification : updated}
+                updated[index] =
+                    type === "key"
+                        ? { [newValue]: oldValue }
+                        : { [oldKey]: newValue };
+                return {
+                    ...prev,
+                    product_specification: updated,
+                };
+            });
+        } else {
+            // Newly added specification
+            const detailsIndex = index - productSpecLength;
 
-            return { ...prev, product_specification: updated }
-        })
-    }
+            setDetails(prev => {
+                const updated = [...prev];
+
+                const oldValue =
+                    updated[detailsIndex][oldKey];
+
+                updated[detailsIndex] =
+                    type === "key"
+                        ? { [newValue]: oldValue }
+                        : { [oldKey]: newValue };
+
+                return updated;
+            });
+        }
+    };
 
     const removeImage = (index) => {
         const existingImages = selectproduct?.product_images || []
@@ -160,6 +178,7 @@ console.log('Product Specification:', productSpecification);
 
 
     const handleViewMore = (product) => {
+        setIsEditing(false)
         setSelectproduct(product);
 
         setColors(
@@ -200,58 +219,26 @@ console.log('Product Specification:', productSpecification);
         e.target.value = ''
     }
 
+    const handleSpecificationDelete = (index) => {
+        const productSpecLength =
+            selectproduct.product_specification?.length || 0;
 
-    // Update product 
-    const handleUpdateProduct = async (e) => {
-        e.preventDefault()
+        if (index < productSpecLength) {
+            setSelectproduct(prev => ({
+                ...prev,
+                product_specification:
+                    prev.product_specification.filter(
+                        (_, i) => i !== index
+                    ),
+            }));
+        } else {
+            const detailsIndex = index - productSpecLength;
 
-        setLoading(true)
-
-        const formData = new FormData()
-
-        formData.append("product_uuid", selectproduct.uuid)
-        formData.append('product_name', selectproduct.name)
-        console.log('product_name', selectproduct.name);
-
-        formData.append('product_color', JSON.stringify(colors))
-        formData.append("product_size", selectproduct.product_size)
-        formData.append("product_weight", selectproduct.product_weight)
-        formData.append("product_length", selectproduct.product_length)
-        formData.append("product_width", selectproduct.product_width)
-        formData.append("product_specification", JSON.stringify(selectproduct.product_specification || details))
-        formData.append("product_mrp", selectproduct.product_mrp)
-        formData.append("product_offer_price", selectproduct.product_offer_price)
-        formData.append("product_quantity", selectproduct.product_quantity)
-        formData.append("product_available_quantity", selectproduct.product_available_quantity)
-
-        //existing Images
-        formData.append('existing_images', JSON.stringify(selectproduct.product_images || []))
-
-        //new images
-        images.forEach((file) => { formData.append('images', file) })
-
-        const toastloading = toast.loading("Updating...")
-        try {
-            const res = await axios.put('http://localhost:3000/admin/api/update/product', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            })
-
-            const { message, type } = res.data
-
-            toast[type](message, {
-                id: toastloading
-            })
-
-            setLoading(false)
-            setIsViewmoreModalOpen(false)
-
-
-        } catch (err) {
-            console.log("Product Update Error:", err);
+            setDetails(prev =>
+                prev.filter((_, i) => i !== detailsIndex)
+            );
         }
-
-    }
-
+    };
 
     return (
         <>
@@ -277,7 +264,7 @@ console.log('Product Specification:', productSpecification);
                         <h3>Products List</h3>
                     </div>
 
-                    <div className="card-body">
+                    <div className="card-body" onClick={() => setOpenMoreMenu(null)}>
 
                         {/* <div className="product-card"> */}
                         {/* <div className="card-header"> */}
@@ -306,8 +293,7 @@ console.log('Product Specification:', productSpecification);
 
                             <tbody>
                                 {allproducts?.map((products, index) => {
-                                    // const categoryData = brand[category]
-                                    // console.log("Categorydata", categoryData.category_name);
+
 
                                     const categoryData = category.find(
                                         cat => cat.uuid === products.category_uuid
@@ -317,6 +303,12 @@ console.log('Product Specification:', productSpecification);
                                         brand => brand.uuid === products.brand_uuid
                                     )
 
+                                    // const brandData = brand.find(item => item.brand_uuid === selectproduct.brand_uuid)
+                                    // const filteredBrands = brand.filter(
+                                    //     item =>
+                                    //         item.category_uuid ===
+                                    //         selectproduct.category_uuid
+                                    // );
 
                                     return (
 
@@ -333,11 +325,21 @@ console.log('Product Specification:', productSpecification);
                                             <td>
                                                 <div>
                                                     <h4>{categoryData?.name || 'No Category'}</h4>
+                                                    {/* <select value={selectproduct.category_uuid || ""} disabled={!isEditing} onChange={(e) => setSelectproduct(prev => ({ ...prev, category_uuid: e.target.value, brand_uuid: '' }))}>
+                                                        {category.map((cat) => {
+                                                            <option key={cat.uuid} value={cat.uuid}>{cat.name}</option>
+                                                        })}
+                                                    </select> */}
                                                 </div>
                                             </td>
                                             <td>
                                                 <div>
                                                     <h4>{brandData?.name || 'No Brand'}</h4>
+                                                    {/* <select value={selectproduct.brand_uuid || ""} disabled={!isEditing} onChange={(e) => setSelectproduct(prev => ({ ...prev, brand_uuid: e.target.value}))}>
+                                                        {filteredBrands.map((item) => {
+                                                            <option key={item.brand_uuid} value={item.brand_uuid}>{item.brand_name}</option>
+                                                        })}
+                                                    </select> */}
                                                 </div>
                                             </td>
 
@@ -393,13 +395,13 @@ console.log('Product Specification:', productSpecification);
 
                                                         <button
                                                             className="menu-btn"
-                                                            onClick={() => setOpenMoreMenu(openMoreMenu === index ? null : index)}
+                                                            onClick={(e) => { e.stopPropagation(), setOpenMoreMenu(openMoreMenu === index ? null : index) }}
                                                         >
                                                             •••
                                                         </button>
                                                     </div>
                                                     {openMoreMenu === index && (
-                                                        <div className="dropdown-menu">
+                                                        <div className="dropdown-menu" onClick={(e) => e.stopPropagation()}>
                                                             <button className="dropdown-item" onClick={() => handleViewMore(products)}>
                                                                 View More
                                                             </button>
@@ -444,23 +446,80 @@ console.log('Product Specification:', productSpecification);
                     brand => brand.uuid === selectproduct.brand_uuid
                 )
 
-                // const colors =
-                //     typeof selectproduct.product_color === "string"
-                //         ? selectproduct.product_color.split(",")
-                //         : selectproduct.product_color || [];
+
 
                 const productSpecification =
                     typeof selectproduct.product_specification === 'string'
                         ? selectproduct.product_specification.split(",")
                         : selectproduct.product_specification || []
 
+                const allSpecifications = [...productSpecification, ...details]
+
+                console.log('All the SPecification together', allSpecifications);
+
+
+                // Update product 
+                const handleUpdateProduct = async (e) => {
+                    e.preventDefault()
+
+                    // const allSpecifications = [...productSpecification, ...details]
+
+                    console.log('All Specification to send in form', allSpecifications);
+
+
+                    setLoading(true)
+
+                    const formData = new FormData()
+
+                    formData.append("product_uuid", selectproduct.uuid)
+                    formData.append('product_name', selectproduct.name)
+                    console.log('product_name', selectproduct.name);
+
+                    formData.append('product_color', JSON.stringify(colors))
+                    formData.append("product_size", selectproduct.product_size)
+                    formData.append("product_weight", selectproduct.product_weight)
+                    formData.append("product_length", selectproduct.product_length)
+                    formData.append("product_width", selectproduct.product_width)
+                    formData.append("product_specification", JSON.stringify(allSpecifications))
+                    formData.append("product_mrp", selectproduct.product_mrp)
+                    formData.append("product_offer_price", selectproduct.product_offer_price)
+                    formData.append("product_quantity", selectproduct.product_quantity)
+                    formData.append("product_available_quantity", selectproduct.product_available_quantity)
+
+                    //existing Images
+                    formData.append('existing_images', JSON.stringify(selectproduct.product_images || []))
+
+                    //new images
+                    images.forEach((file) => { formData.append('images', file) })
+
+                    const toastloading = toast.loading("Updating...")
+                    try {
+                        const res = await axios.put('http://localhost:3000/admin/api/update/product', formData, {
+                            headers: { 'Content-Type': 'multipart/form-data' }
+                        })
+
+                        const { message, type } = res.data
+
+                        toast[type](message, {
+                            id: toastloading
+                        })
+
+                        setLoading(false)
+                        setIsViewmoreModalOpen(false)
+                        getproducts()
+
+                    } catch (err) {
+                        console.log("Product Update Error:", err);
+                    }
+
+                }
 
 
                 return (
                     <>
                         <div className="modal-overlay" onClick={() => setIsViewmoreModalOpen(false)}>
                             <div className="main-content details-container" style={{ display: isViewmoreModalOpen ? 'block' : 'none', width: '90%', padding: '25px', background: '#111c33;', borderRadius: '25px', maxHeight: '95%', overflowY: 'auto', overflowX: 'hidden' }} onClick={(e) => e.stopPropagation()}>
-                                <button className="close-btn" onClick={() => setIsViewmoreModalOpen(false)} type="button">×</button>
+                                <button className="close-btn" onClick={() => { setIsViewmoreModalOpen(false), setDetails([]), setSelectproduct(null), setOpenMoreMenu(false) }} type="button">×</button>
 
                                 <form onSubmit={handleUpdateProduct}>
                                     <div className="" style={{ color: 'white' }}>
@@ -490,8 +549,6 @@ console.log('Product Specification:', productSpecification);
 
                                                     <div className="form-group">
                                                         <label>Product Color</label>
-
-
 
                                                         {/* <ProductColors color={colors} setColor={setColors} style={{ marginTop: '0' }} /> */}
                                                         <NewAddProductColors color={colors} setColor={setColors} style={{ marginTop: '0' }} />
@@ -566,11 +623,12 @@ console.log('Product Specification:', productSpecification);
                                                     </div>
                                                 </div>
 
+                                                <Details_components details={details} setDetails={setDetails} />
 
-                                                {productSpecification && productSpecification?.length > 0 ? (
+                                                {allSpecifications && allSpecifications?.length > 0 ? (
                                                     <>
                                                         <div className="form-grid details-container" style={{ marginTop: '15px' }}>
-                                                            {productSpecification?.map((item, index) => (
+                                                            {allSpecifications?.map((item, index) => (
                                                                 <>
                                                                     <div key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center', flexDirection: 'column' }}>
                                                                         {Object.entries(item).map(([key, value], Entryindex) => (
@@ -583,7 +641,7 @@ console.log('Product Specification:', productSpecification);
                                                                                     <button type="button" className="color-add-button" onClick={() => setEditspecificationIndex(editspecificationIndex === index ? null : index)}>
                                                                                         {editspecificationIndex === index ? 'Update' : 'Edit'}
                                                                                     </button>
-                                                                                    <button type="button" className="color-add-button delete-button" >
+                                                                                    <button type="button" className="color-add-button delete-button" onClick={() => handleSpecificationDelete(index, key)}>
                                                                                         Delete
                                                                                     </button>
                                                                                 </div>
@@ -597,7 +655,7 @@ console.log('Product Specification:', productSpecification);
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Details_components details={details} setDetails={setDetails} />
+                                                        {/* <Details_components details={details} setDetails={setDetails} /> */}
                                                     </>
                                                 )}
 

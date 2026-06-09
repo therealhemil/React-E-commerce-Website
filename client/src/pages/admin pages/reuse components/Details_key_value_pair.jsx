@@ -7,64 +7,55 @@ export function Details_components({ details, setDetails, labelName }) {
   const [newValue, setNewValue] = useState('');
   const [editIndex, setEditIndex] = useState(null);
 
-  // const addMoreDetails = () => {
-  //   setDetails([
-  //     ...details,
-  //     { key: "", value: "" }
-  //   ]);
-  // };
 
   console.log("All Details list: ", details);
-  
 
-  const addMoreDetails =()=>{
-    if(!newKey.trim() || !newValue.trim()){
-      toast.error('Enter Product Specification')
-      return 
+  const addMoreDetails = () => {
+    if (!newKey.trim() || !newValue.trim()) {
+      toast.error("Enter Product Specification");
+      return;
     }
 
-    setDetails(prevDetail => [
-      ...prevDetail,
-      {key: newKey, value : newValue}
+    setDetails(prev => [
+      ...prev, {
+        [newKey]: newValue
+      }
     ])
 
-    setNewKey('')
-    setNewValue('')
-  }
+    setNewKey("");
+    setNewValue("");
+  };
 
-  const handleEdit = (index)=>{
-    setNewKey(details[index].key)
-    setNewValue(details[index].value)
-    setEditIndex(index)
-  }
+  const handleEdit = (index) => {
+    const key = Object.keys(details[index])[0];
+    const value = details[index][key];
 
-  const UpdateDetail = ()=>{
-    const Updated = [...details]
-    Updated[editIndex] = {
-      key: newKey,
-      value : newValue
+    setNewKey(key);
+    setNewValue(value);
+    setEditIndex(index);
+  };
+
+  const updateDetail = () => {
+    const updated = [...details];
+
+    updated[editIndex] = {
+      [newKey]: newValue
     }
-    setDetails(Updated)
 
-    setEditIndex(null)
-    setNewKey('')
-    setNewValue("")
-  }
+    setDetails(updated);
 
-
-
-  const handleChange = (index, field, value) => {
-    const updatedDetails = [...details];
-    updatedDetails[index][field] = value;
-    console.log('Updated Details:', updatedDetails);
-
-    setDetails(updatedDetails);
+    setEditIndex(null);
+    setNewKey("");
+    setNewValue("");
   };
 
   const removeDetail = (index) => {
-    const updatedDetails = details.filter((_, i) => i !== index);
-    setDetails(updatedDetails);
+    setDetails(prev =>
+      prev.filter((_, i) => i !== index)
+    );
   };
+
+
 
   return (
     <>
@@ -90,47 +81,34 @@ export function Details_components({ details, setDetails, labelName }) {
           </div>
         </div>
 
-        {details && details.length > 0 ? (
-          <>
-            {details.map((detail, index) => (
-              <div key={index} className="detail-row" style={{ display: "flex", gap: "15px", marginBottom: "15px", alignItems: "center", justifyContent: 'space-between' }} >
-                <strong>{index + 1}</strong>
-                <input type="text" placeholder="Product Detail (e.g. Product Ram)" value={detail.key}  style={{ width: "45%", padding: "8px" }} />
-
-                <input type="text" placeholder="Prouduct Value (e.g. 8GB, 16GB)" value={detail.value}  style={{ width: "45%", padding: "8px" }} />
-
-                <div className="add-more-button" style={{ width: '17%', display: 'flex', gap: '7px' }}>
-                  <button className="addMore-detail-button" style={{ width: '100%', height: '35px', borderRadius: '25px', cursor: 'pointer', backgroundColor: '#4f46e5', color: 'white', border: 'none' }} type="button" onClick={()=> handleEdit(index)} >
-                    Edit
-                  </button>
-                  <button className="delete-detail-button" style={{ width: '100%', height: '35px', borderRadius: '25px', cursor: 'pointer', backgroundColor: '#ff0000e6', color: 'white', border: 'none' }} type="button" onClick={() => removeDetail(index)} >
-                    Delete
-                  </button>
-                </div>
-              </div>
-
-              // <div className="detail-row" key={index} style={{ display: "flex", gap: "10px", marginBottom: "15px", alignItems: "center", justifyContent: 'space-between' }} >
-              //   <strong>{index + 1}</strong>
-
-              //   <div className="add-more-button" style={{ display: 'flex' }}>
-              //     <button style={{ width: '30%', height: '35px', borderRadius: '25px', cursor: 'pointer', backgroundColor: '#4f46e5', color: 'white' }} type="button" onClick={addMoreDetails} >
-              //       Edit
-              //     </button>
-              //     <button style={{ borderRadius: '25px', height: '30px', width: '65px', backgroundColor: '#ff0000e6', color: 'white' }} type="button" onClick={() => removeDetail(index)} >
-              //       Remove
-              //     </button>
-              //   </div>
-
-              // </div>
-            ))}
-          </>
-        ) : (
-          <>
-            {/* <h1>No Details</h1> */}
-          </>
-        )}
 
       </div >
     </>
   );
 }
+// {details && details.length > 1 ? (
+//   <>
+//     {Object.entries(details[0]).map(([key, value], index) => (
+//       <div key={key} className="detail-row" style={{ display: "flex", gap: "15px", marginBottom: "15px", alignItems: "center", justifyContent: 'space-between' }} >
+//         <strong>{key + 1}</strong>
+//         <input type="text" placeholder="Product Detail (e.g. Product Ram)" value={key} style={{ width: "45%", padding: "8px" }} />
+
+//         <input type="text" placeholder="Prouduct Value (e.g. 8GB, 16GB)" value={value} style={{ width: "45%", padding: "8px" }} />
+
+//         <div className="add-more-button" style={{ width: '17%', display: 'flex', gap: '7px' }}>
+//           <button className="addMore-detail-button" style={{ width: '100%', height: '35px', borderRadius: '25px', cursor: 'pointer', backgroundColor: '#4f46e5', color: 'white', border: 'none' }} type="button" onClick={() => handleEdit(index)} >
+//             Edit
+//           </button>
+//           <button className="delete-detail-button" style={{ width: '100%', height: '35px', borderRadius: '25px', cursor: 'pointer', backgroundColor: '#ff0000e6', color: 'white', border: 'none' }} type="button" onClick={() => removeDetail(index)} >
+//             Delete
+//           </button>
+//         </div>
+//       </div>
+
+//     ))}
+//   </>
+// ) : (
+//   <>
+//     {/* <h1>No Details</h1> */}
+//   </>
+// )}
