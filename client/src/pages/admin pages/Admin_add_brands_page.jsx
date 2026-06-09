@@ -265,7 +265,7 @@ export const Admin_addBrands = () => {
 
                       <td>
                         <div>
-                          <h4>{categoryData.name || "No Category"}</h4>
+                          {/* <h4>{categoryData.name || "No Category"}</h4> */}
                         </div>
                       </td>
 

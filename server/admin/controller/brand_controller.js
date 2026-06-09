@@ -1,4 +1,6 @@
-import { brand_category } from "../../models/brand_catgeory_model.js";
+
+
+import { brand_categoryQuery } from "../../models/brand_category_model.js";
 import { BrandsQuery, categoriesQuery } from "../../models/relations_model.js"
 
 
@@ -19,7 +21,6 @@ export const addBrandsInCategory = async (req, res) => {
             }
         })
 
-        brand_category
         if (!category) {
             return res.status(404).json({
                 message: "Category Not Found",
@@ -28,9 +29,13 @@ export const addBrandsInCategory = async (req, res) => {
         }
 
         const brand = await BrandsQuery.create({
-            name: brand_name,
-            category_uuid
+            name: brand_name
         })
+
+        await brand_categoryQuery.bulkCreate(category_uuid.map(catId => ({
+            brand_uuid : brand.uuid,
+            category_uuid : catId
+        })))
 
         return res.status(201).json({
             message: "Brand Added Successfully",
@@ -55,12 +60,14 @@ export const getbrandDetail = async (req, res) => {
     try {
         const getbrandDetail = await BrandsQuery.findAll({
             attributes: ['id', 'uuid', 'category_uuid', 'name', 'brand_image'],
-            order: [['id', 'ASC']]
+            order: [['id', 'ASC']],
+            include : brand_categoryQuery
         })
 
         const getcategoryNameOnly = await categoriesQuery.findAll({
             attributes: ['uuid', 'name'],
-            order: [['id', 'ASC']]
+            order: [['id', 'ASC']], 
+            include : brand_categoryQuery
         })
 
 
@@ -173,7 +180,8 @@ export const getbrand_categoryDetails = async (req, res) => {
     try {
         const getbrandDetail = await BrandsQuery.findAll({
             attributes: ['id', 'uuid', 'name', 'brand_image'],
-            order: [['id', 'ASC']]
+            order: [['id', 'ASC']],
+            
         })
 
         const getcategoryNameOnly = await categoriesQuery.findAll({
